@@ -16,8 +16,22 @@ if compare != "exit":
         print "### Se encontro el fichero a comparar"
         for f in files:
             print " - "+f
-        if raw_input("### Comparar todos los ficheros y generar archivos?(Type 'Si') ") == "si":
-            pass
+        if raw_input("### Comparar todos los ficheros y generar archivos?(Type 'Si') ").upper() in ["SI","S","YES"]:
+            cf = open('compare.csv')
+            emails_to_compare = [line for line in csv.reader(cf)]
+            cf.close()
+            for f in files:
+                fo = open(f)
+                coincidencias = [line for line in csv.reader(fo) if line in emails_to_compare]
+                fo.close()
+                if len(coincidencias) > 0:
+                    print "Se encontraron %d coincidencias en el fichero %s" % (len(coincidencias), f)
+                    print "################"
+                    to_write  = open('results_'+f, "wb")
+                    writer = csv.writer(to_write, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+                    for row in coincidencias:
+                        writer.writerow(row)
+                    to_write.close()
     else:
         print "NO SE ENCONTRO EL FICHERO"
         print "### ficheros encontrados:"
